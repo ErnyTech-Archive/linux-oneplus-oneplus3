@@ -1,0 +1,24 @@
+From f073aa86ceec4a89e95f58b62e4aa0f47b3ebb85 Mon Sep 17 00:00:00 2001
+From: Ernesto Castellotti <erny.castell@gmail.com>
+Date: Fri, 16 Nov 2018 21:04:29 +0100
+Subject: [PATCH] Removed Werror in qcacld-2.0 driver
+
+---
+ drivers/staging/qcacld-2.0/Kbuild | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/drivers/staging/qcacld-2.0/Kbuild b/drivers/staging/qcacld-2.0/Kbuild
+index 202b4db4cf6d..ff02b56719ed 100644
+--- a/drivers/staging/qcacld-2.0/Kbuild
++++ b/drivers/staging/qcacld-2.0/Kbuild
+@@ -1018,7 +1018,6 @@ CDEFINES :=	-DANI_LITTLE_BYTE_ENDIAN \
+ 		-DWLAN_PERF \
+ 		-DPTT_SOCK_SVC_ENABLE \
+ 		-Wall\
+-		-Werror\
+ 		-D__linux__ \
+ 		-DHAL_SELF_STA_PER_BSS=1 \
+ 		-DWLAN_FEATURE_VOWIFI_11R \
+-- 
+2.19.1
+

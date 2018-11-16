@@ -24,6 +24,9 @@ _config="config-${_flavor}.${arch}"
 source="
 	$pkgname-$_commit.tar.gz::https://github.com/LineageOS/${_repository}/archive/${_commit}.tar.gz
 	$_config
+	0001-Fix-kernel-build-for-headers.patch
+	0001-Makefile-Fix-device-not-booting-with-GCC-7.x-and-abo.patch
+	0001-Removed-Werror-in-qcacld-2.0-driver.patch
 "
 builddir="$srcdir/${_repository}-${_commit}"
 

@@ -1,0 +1,338 @@
+From efc0a1f2bade810531d0b895257718a558e8fc6c Mon Sep 17 00:00:00 2001
+From: Ernesto Castellotti <erny.castell@gmail.com>
+Date: Fri, 16 Nov 2018 20:24:50 +0100
+Subject: [PATCH] Fix kernel build for headers
+
+---
+ drivers/gpio/gpiolib.c                                   | 2 +-
+ drivers/media/platform/msm/camera_v2/isp/Makefile        | 1 +
+ drivers/media/platform/msm/camera_v2/isp/msm_isp_util.c  | 2 +-
+ drivers/media/platform/msm/camera_v2/sensor/io/Makefile  | 1 +
+ drivers/media/platform/msm/camera_v2/sensor/msm_sensor.h | 6 +++---
+ drivers/net/ethernet/msm/Makefile                        | 1 +
+ drivers/platform/msm/ipa/ipa_v2/Makefile                 | 1 +
+ drivers/platform/msm/mhi/mhi_ssr.c                       | 4 ++--
+ drivers/power/bq27541_fuelgauger.c                       | 2 +-
+ drivers/power/oneplus_fastcg.c                           | 2 +-
+ drivers/power/op_dash_adapter.c                          | 2 +-
+ drivers/power/op_dash_adapter.h                          | 2 +-
+ drivers/power/qpnp-fg.c                                  | 2 +-
+ drivers/power/qpnp-smbcharger.c                          | 2 +-
+ drivers/soc/qcom/Makefile                                | 1 +
+ drivers/usb/dwc3/ep0.c                                   | 2 +-
+ drivers/usb/gadget/Makefile                              | 2 +-
+ drivers/usb/gadget/function/f_midi.c                     | 2 +-
+ {drivers => include/linux}/power/oem_external_fg.h       | 0
+ include/trace/events/msm_cam.h                           | 2 +-
+ sound/soc/msm/apq8096-auto.c                             | 2 +-
+ sound/soc/msm/apq8096-i2c.c                              | 2 +-
+ sound/soc/msm/msm8996.c                                  | 2 +-
+ 23 files changed, 25 insertions(+), 20 deletions(-)
+ rename {drivers => include/linux}/power/oem_external_fg.h (100%)
+
+diff --git a/drivers/gpio/gpiolib.c b/drivers/gpio/gpiolib.c
+index 9009f68717b7..3d8fc47978db 100644
+--- a/drivers/gpio/gpiolib.c
++++ b/drivers/gpio/gpiolib.c
+@@ -20,7 +20,7 @@
+ 
+ #define CREATE_TRACE_POINTS
+ #include <trace/events/gpio.h>
+-#include <../power/oem_external_fg.h>
++#include <linux/power/oem_external_fg.h>
+ 
+ /* Implementation infrastructure for GPIO interfaces.
+  *
+diff --git a/drivers/media/platform/msm/camera_v2/isp/Makefile b/drivers/media/platform/msm/camera_v2/isp/Makefile
+index 4c6586e2616c..0f6fd60ee318 100644
+--- a/drivers/media/platform/msm/camera_v2/isp/Makefile
++++ b/drivers/media/platform/msm/camera_v2/isp/Makefile
+@@ -1,6 +1,7 @@
+ ccflags-y += -Idrivers/media/platform/msm/camera_v2
+ ccflags-y += -Idrivers/media/platform/msm/camera_v2/sensor/io
+ ccflags-y += -Idrivers/media/platform/msm/camera_v2/common/
++ccflags-y += -Idrivers/media/platform/msm/camera_v2/isp
+ ifeq ($(CONFIG_MSM_ISP_V1),y)
+ obj-$(CONFIG_MSMB_CAMERA) += msm_isp_32.o msm_buf_mgr_32.o msm_isp_util_32.o msm_isp_axi_util_32.o msm_isp_stats_util_32.o
+ obj-$(CONFIG_MSMB_CAMERA) += msm_isp32.o
+diff --git a/drivers/media/platform/msm/camera_v2/isp/msm_isp_util.c b/drivers/media/platform/msm/camera_v2/isp/msm_isp_util.c
+index 6ef0cd85d9f1..0c81d6f9dbe8 100644
+--- a/drivers/media/platform/msm/camera_v2/isp/msm_isp_util.c
++++ b/drivers/media/platform/msm/camera_v2/isp/msm_isp_util.c
+@@ -21,7 +21,7 @@
+ #include "msm_camera_io_util.h"
+ #include "cam_smmu_api.h"
+ #define CREATE_TRACE_POINTS
+-#include "trace/events/msm_cam.h"
++#include <trace/events/msm_cam.h>
+ 
+ #define MAX_ISP_V4l2_EVENTS 100
+ #define MAX_ISP_REG_LIST 100
+diff --git a/drivers/media/platform/msm/camera_v2/sensor/io/Makefile b/drivers/media/platform/msm/camera_v2/sensor/io/Makefile
+index 549c35a806f7..d8965225fbc7 100644
+--- a/drivers/media/platform/msm/camera_v2/sensor/io/Makefile
++++ b/drivers/media/platform/msm/camera_v2/sensor/io/Makefile
+@@ -1,6 +1,7 @@
+ ccflags-y += -Idrivers/media/platform/msm/camera_v2/
+ ccflags-y += -Idrivers/media/platform/msm/camera_v2/common
+ ccflags-y += -Idrivers/media/platform/msm/camera_v2/sensor
++ccflags-y += -Idrivers/media/platform/msm/camera_v2/sensor/io
+ ccflags-y += -Idrivers/media/platform/msm/camera_v2/sensor/cci
+ ccflags-y += -Idrivers/misc/
+ obj-$(CONFIG_MSMB_CAMERA)   += msm_camera_cci_i2c.o msm_camera_qup_i2c.o msm_camera_spi.o msm_camera_dt_util.o msm_camera_tz_i2c.o
+diff --git a/drivers/media/platform/msm/camera_v2/sensor/msm_sensor.h b/drivers/media/platform/msm/camera_v2/sensor/msm_sensor.h
+index 74d027256425..81b1a030ce34 100644
+--- a/drivers/media/platform/msm/camera_v2/sensor/msm_sensor.h
++++ b/drivers/media/platform/msm/camera_v2/sensor/msm_sensor.h
+@@ -31,9 +31,9 @@
+ #include <media/msm_cam_sensor.h>
+ #include <media/v4l2-subdev.h>
+ #include <media/v4l2-ioctl.h>
+-#include "msm_camera_i2c.h"
+-#include "msm_camera_dt_util.h"
+-#include "msm_sd.h"
++#include <msm_camera_i2c.h>
++#include <msm_camera_dt_util.h>
++#include <msm_sd.h>
+ 
+ #define DEFINE_MSM_MUTEX(mutexname) \
+ 	static struct mutex mutexname = __MUTEX_INITIALIZER(mutexname)
+diff --git a/drivers/net/ethernet/msm/Makefile b/drivers/net/ethernet/msm/Makefile
+index 479027ebd207..e64802427708 100644
+--- a/drivers/net/ethernet/msm/Makefile
++++ b/drivers/net/ethernet/msm/Makefile
+@@ -1,6 +1,7 @@
+ #
+ # Makefile for the msm networking support.
+ #
++CFLAGS_rndis_ipa.o := -I$(src)
+ 
+ obj-$(CONFIG_MSM_RMNET_MHI) += msm_rmnet_mhi.o
+ obj-$(CONFIG_ECM_IPA) += ecm_ipa.o
+diff --git a/drivers/platform/msm/ipa/ipa_v2/Makefile b/drivers/platform/msm/ipa/ipa_v2/Makefile
+index fb039709261e..243307a1b10f 100644
+--- a/drivers/platform/msm/ipa/ipa_v2/Makefile
++++ b/drivers/platform/msm/ipa/ipa_v2/Makefile
+@@ -1,3 +1,4 @@
++CFLAGS_ipa.o := -I$(src)
+ obj-$(CONFIG_IPA) += ipat.o
+ ipat-y := ipa.o ipa_debugfs.o ipa_hdr.o ipa_flt.o ipa_rt.o ipa_dp.o ipa_client.o \
+ 	ipa_utils.o ipa_nat.o ipa_intf.o teth_bridge.o ipa_interrupts.o \
+diff --git a/drivers/platform/msm/mhi/mhi_ssr.c b/drivers/platform/msm/mhi/mhi_ssr.c
+index f4f2e427972f..916f5c17668b 100644
+--- a/drivers/platform/msm/mhi/mhi_ssr.c
++++ b/drivers/platform/msm/mhi/mhi_ssr.c
+@@ -11,11 +11,11 @@
+  */
+ 
+ #include <linux/pm_runtime.h>
+-#include <mhi_sys.h>
+-#include <mhi.h>
+ #include <soc/qcom/subsystem_restart.h>
+ #include <soc/qcom/subsystem_notif.h>
+ #include <linux/esoc_client.h>
++#include "mhi_sys.h"
++#include "mhi.h"
+ 
+ static int mhi_ssr_notify_cb(struct notifier_block *nb,
+ 			unsigned long action, void *data)
+diff --git a/drivers/power/bq27541_fuelgauger.c b/drivers/power/bq27541_fuelgauger.c
+index 20b1c0f6e1dc..7fe1dd9c67d4 100644
+--- a/drivers/power/bq27541_fuelgauger.c
++++ b/drivers/power/bq27541_fuelgauger.c
+@@ -32,13 +32,13 @@
+ #include <linux/regulator/machine.h>
+ #include <linux/err.h>
+ #include <linux/rtc.h>
++#include <linux/power/oem_external_fg.h>
+ 
+ #ifdef CONFIG_OF
+ #include <linux/gpio.h>
+ #include <linux/of_gpio.h>
+ #endif
+ #include <linux/wakelock.h>
+-#include "oem_external_fg.h"
+ 
+ 
+ #define DRIVER_VERSION			"1.1.0"
+diff --git a/drivers/power/oneplus_fastcg.c b/drivers/power/oneplus_fastcg.c
+index f1e6ecc83171..30ddee9bdcca 100644
+--- a/drivers/power/oneplus_fastcg.c
++++ b/drivers/power/oneplus_fastcg.c
+@@ -16,7 +16,7 @@
+ #include <linux/power_supply.h>
+ #include <linux/wakelock.h>
+ #include <linux/interrupt.h>
+-#include "oem_external_fg.h"
++#include <linux/power/oem_external_fg.h>
+ 
+ #include <soc/qcom/clock-rpm.h>
+ #include <dt-bindings/clock/msm-clocks-8996.h>
+diff --git a/drivers/power/op_dash_adapter.c b/drivers/power/op_dash_adapter.c
+index 5c74faf01c3f..9d4a3364b0f2 100644
+--- a/drivers/power/op_dash_adapter.c
++++ b/drivers/power/op_dash_adapter.c
+@@ -3,8 +3,8 @@
+ #include <linux/module.h>
+ #include <linux/slab.h>
+ #include <linux/time.h>
++#include <linux/power/oem_external_fg.h>
+ #include "op_dash_adapter.h"
+-#include "oem_external_fg.h"
+ 
+ static struct op_adapter_chip *the_chip;
+ 
+diff --git a/drivers/power/op_dash_adapter.h b/drivers/power/op_dash_adapter.h
+index 40064d9de49f..ff31d81a5053 100644
+--- a/drivers/power/op_dash_adapter.h
++++ b/drivers/power/op_dash_adapter.h
+@@ -54,7 +54,7 @@
+ #define Boot_Over_Cmd_Count			2000		//physical test:34
+ #define Other_Cmd_count				2000
+ 
+-#include "oem_external_fg.h"
++#include <linux/power/oem_external_fg.h>
+ extern void op_adapter_init(struct op_adapter_chip *chip);
+ //fw_ver must be 0x0b/0x0c/0x0d/0x0e/0x0f because of pic1508/stm8s
+ 
+diff --git a/drivers/power/qpnp-fg.c b/drivers/power/qpnp-fg.c
+index 4706df5ec63e..c40f186b0899 100644
+--- a/drivers/power/qpnp-fg.c
++++ b/drivers/power/qpnp-fg.c
+@@ -35,7 +35,7 @@
+ #include <linux/string_helpers.h>
+ #include <linux/alarmtimer.h>
+ #include <linux/qpnp/qpnp-revid.h>
+-#include "oem_external_fg.h"
++#include <linux/power/oem_external_fg.h>
+ 
+ /* Register offsets */
+ 
+diff --git a/drivers/power/qpnp-smbcharger.c b/drivers/power/qpnp-smbcharger.c
+index 1fc891051838..8db89df0ce53 100644
+--- a/drivers/power/qpnp-smbcharger.c
++++ b/drivers/power/qpnp-smbcharger.c
+@@ -39,7 +39,7 @@
+ #include <linux/msm_bcl.h>
+ #include <linux/ktime.h>
+ #include <linux/pmic-voter.h>
+-#include "oem_external_fg.h"
++#include <linux/power/oem_external_fg.h>
+ #include <linux/type-c_notifier.h>
+ #include <linux/wakelock.h>
+ #include <linux/proc_fs.h>
+diff --git a/drivers/soc/qcom/Makefile b/drivers/soc/qcom/Makefile
+index 0dadf475965c..1568357c3b89 100644
+--- a/drivers/soc/qcom/Makefile
++++ b/drivers/soc/qcom/Makefile
+@@ -1,5 +1,6 @@
+ KASAN_SANITIZE_scm.o := n
+ 
++CFLAGS_tracer_pkt.o := -I$(src)
+ CFLAGS_scm.o :=$(call as-instr,.arch_extension sec,-DREQUIRES_SEC=1)
+ 
+ ccflags-$(CONFIG_MSM_QBT1000) += -Idrivers/misc/
+diff --git a/drivers/usb/dwc3/ep0.c b/drivers/usb/dwc3/ep0.c
+index 2bb9d7f8df54..b1ff6a877228 100644
+--- a/drivers/usb/dwc3/ep0.c
++++ b/drivers/usb/dwc3/ep0.c
+@@ -30,13 +30,13 @@
+ #include <linux/usb/ch9.h>
+ #include <linux/usb/gadget.h>
+ #include <linux/usb/composite.h>
++#include <linux/power/oem_external_fg.h>
+ 
+ #include "core.h"
+ #include "debug.h"
+ #include "gadget.h"
+ #include "io.h"
+ #include "debug.h"
+-#include "../../power/oem_external_fg.h"
+ 
+ 
+ static bool enable_dwc3_u1u2;
+diff --git a/drivers/usb/gadget/Makefile b/drivers/usb/gadget/Makefile
+index 4afaaaadff31..7ece0a7efc03 100644
+--- a/drivers/usb/gadget/Makefile
++++ b/drivers/usb/gadget/Makefile
+@@ -3,7 +3,7 @@
+ #
+ subdir-ccflags-$(CONFIG_USB_GADGET_DEBUG)	:= -DDEBUG
+ subdir-ccflags-$(CONFIG_USB_GADGET_VERBOSE)	+= -DVERBOSE_DEBUG
+-ccflags-y				+= -I$(srctree)/drivers/usb/gadget/udc -I$(srctree)/drivers/usb/gadget/function
++ccflags-y				+= -I$(srctree)/drivers/usb/gadget/udc -I$(srctree)/drivers/usb/gadget -I$(srctree)/drivers/usb/gadget/function
+ 
+ obj-$(CONFIG_USB_LIBCOMPOSITE)	+= libcomposite.o
+ libcomposite-y			:= usbstring.o config.o epautoconf.o
+diff --git a/drivers/usb/gadget/function/f_midi.c b/drivers/usb/gadget/function/f_midi.c
+index bc2663d3c6c8..843ee6871a3f 100644
+--- a/drivers/usb/gadget/function/f_midi.c
++++ b/drivers/usb/gadget/function/f_midi.c
+@@ -32,7 +32,7 @@
+ #include <linux/usb/audio.h>
+ #include <linux/usb/midi.h>
+ 
+-#include "u_f.h"
++#include <u_f.h>
+ 
+ MODULE_AUTHOR("Ben Williamson");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/power/oem_external_fg.h b/include/linux/power/oem_external_fg.h
+similarity index 100%
+rename from drivers/power/oem_external_fg.h
+rename to include/linux/power/oem_external_fg.h
+diff --git a/include/trace/events/msm_cam.h b/include/trace/events/msm_cam.h
+index 9a5dd158b4b8..2dfbee6c6479 100644
+--- a/include/trace/events/msm_cam.h
++++ b/include/trace/events/msm_cam.h
+@@ -16,7 +16,7 @@
+ #if !defined(_TRACE_MSM_VFE_H) || defined(TRACE_HEADER_MULTI_READ)
+ #define _TRACE_MSM_VFE_H
+ 
+-#include "msm_isp.h"
++#include <msm_isp.h>
+ #include <linux/types.h>
+ #include <linux/tracepoint.h>
+ 
+diff --git a/sound/soc/msm/apq8096-auto.c b/sound/soc/msm/apq8096-auto.c
+index 2ae78f75c340..62dd641aa79f 100644
+--- a/sound/soc/msm/apq8096-auto.c
++++ b/sound/soc/msm/apq8096-auto.c
+@@ -33,7 +33,7 @@
+ #include <sound/q6core.h>
+ #include <sound/pcm_params.h>
+ #include <sound/info.h>
+-#include <device_event.h>
++#include "device_event.h"
+ #include "qdsp6v2/msm-pcm-routing-v2.h"
+ 
+ #define DRV_NAME "apq8096-auto-asoc-snd"
+diff --git a/sound/soc/msm/apq8096-i2c.c b/sound/soc/msm/apq8096-i2c.c
+index 8bcda764af09..8d50c6d79605 100644
+--- a/sound/soc/msm/apq8096-i2c.c
++++ b/sound/soc/msm/apq8096-i2c.c
+@@ -31,7 +31,7 @@
+ #include <sound/q6core.h>
+ #include <sound/pcm_params.h>
+ #include <sound/info.h>
+-#include <device_event.h>
++#include "device_event.h"
+ #include "qdsp6v2/msm-pcm-routing-v2.h"
+ #include "../codecs/wcd9xxx-common.h"
+ #include "../codecs/wcd9330.h"
+diff --git a/sound/soc/msm/msm8996.c b/sound/soc/msm/msm8996.c
+index 5bb79e5b6cb4..90a82884cb13 100644
+--- a/sound/soc/msm/msm8996.c
++++ b/sound/soc/msm/msm8996.c
+@@ -31,7 +31,7 @@
+ #include <sound/q6core.h>
+ #include <sound/pcm_params.h>
+ #include <sound/info.h>
+-#include <device_event.h>
++#include "device_event.h"
+ #include "qdsp6v2/msm-pcm-routing-v2.h"
+ #include "../codecs/wcd9xxx-common.h"
+ #include "../codecs/wcd9330.h"
+-- 
+2.19.1
+

@@ -1,0 +1,43 @@
+From 406d54a7f006142372157d4fb49d7e76a5564d00 Mon Sep 17 00:00:00 2001
+From: ZaneZam <cyxman@yahoo.com>
+Date: Thu, 6 Apr 2017 21:47:13 +0200
+Subject: [PATCH] Makefile: Fix device not booting with GCC 7.x and above
+
+@nathanchance: Filtered from the original commit (https://github.com/zanezam/boeffla-kernel-cm-n51x0/commit/228cc26b4b66ce3c9232eb00faaf95c3b1b3ae3c)
+
+I tested all of the flags in the above commit and this is the only
+one that prevented the phone from booting, with -Os, -O2, and -O3.
+
+Without this, the phone will boot to the Google logo, hang for a
+few seconds, then reboot, and repeat the process.
+
+This flag can be read about below. This issue can also be resolved
+(supposedly) with the -mstrict-align flag, leading me to believe it
+is something with memory access. I believe this is a better solution
+though given that ARM handles unaligned access perfectly fine.
+
+https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html#index-fstore-merging
+https://gcc.gnu.org/onlinedocs/gcc/AArch64-Options.html#index-mstrict-align
+
+Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
+---
+ Makefile | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/Makefile b/Makefile
+index b53ee47a1a9..79f41ef5c9b 100644
+--- a/Makefile
++++ b/Makefile
+@@ -587,6 +587,9 @@ KBUILD_CFLAGS	+= $(call cc-disable-warning,unused-const-variable,)
+ # Disable format-truncation warnings
+ KBUILD_CFLAGS   += $(call cc-disable-warning,format-truncation,)
+ 
++# Needed to unbreak GCC 7.x and above
++KBUILD_CFLAGS   += $(call cc-option,-fno-store-merging,)
++
+ include $(srctree)/arch/$(SRCARCH)/Makefile
+ 
+ ifdef CONFIG_READABLE_ASM
+-- 
+2.18.0
+
